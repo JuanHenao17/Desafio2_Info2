@@ -48,13 +48,20 @@ void SistemaUdeAStay::mostrarMenu() {
 }
 
 void SistemaUdeAStay::cargarDatos() {
-    cargarAnfitriones();
-    cargarHuespedes();
-    cargarAlojamientos();
-    cargarReservas();
+    unsigned int iteraciones = 0;
+    unsigned int memoria = 0;
+
+    cargarAnfitriones(iteraciones, memoria);
+    cargarHuespedes(iteraciones, memoria);
+    cargarAlojamientos(iteraciones, memoria);
+    cargarReservas(iteraciones, memoria);
+
+    cout << "Recursos utilizados en la carga de archivos: " << endl;
+    cout << "Iteraciones realizadas: " << iteraciones << endl;
+    cout << "Memoria estimada: " << memoria << " bytes" << endl;
 }
 
-void SistemaUdeAStay::cargarAnfitriones() {
+void SistemaUdeAStay::cargarAnfitriones(unsigned int& iteraciones, unsigned int& memoria) {
     ifstream archivo("anfitriones.txt");
 
     if (!archivo.is_open()) {
@@ -66,6 +73,7 @@ void SistemaUdeAStay::cargarAnfitriones() {
     int index = 0;
 
     while (getline(archivo, linea) && index < MAX_ANFITRIONES) {
+        iteraciones++;
         if (linea.empty()) continue;
 
         size_t pos1 = linea.find(';');
@@ -79,15 +87,15 @@ void SistemaUdeAStay::cargarAnfitriones() {
         float puntuacion = stof(campo3);
 
         anfitriones[index] = new Anfitrion(doc, antiguedad, puntuacion);
+        memoria += sizeof(Anfitrion);
         index++;
     }
 
     archivo.close();
 
-    cout << "Se cargaron " << index << " anfitriones correctamente." << endl;
 }
 
-void SistemaUdeAStay::cargarHuespedes() {
+void SistemaUdeAStay::cargarHuespedes(unsigned int& iteraciones, unsigned int& memoria) {
     ifstream archivo("huespedes.txt");
 
     if (!archivo.is_open()) {
@@ -99,6 +107,7 @@ void SistemaUdeAStay::cargarHuespedes() {
     int index = 0;
 
     while (getline(archivo, linea) && index < MAX_HUESPEDES) {
+        iteraciones++;
         if (linea.empty()) continue;
 
         size_t pos1 = linea.find(';');
@@ -112,14 +121,14 @@ void SistemaUdeAStay::cargarHuespedes() {
         float puntuacion = stof(campo3);
 
         huespedes[index] = new Huesped(doc, antiguedad, puntuacion);
+        memoria += sizeof(Huesped);
         index++;
     }
 
     archivo.close();
-    cout << "Se cargaron " << index << " huespedes correctamente." << endl;
 }
 
-void SistemaUdeAStay::cargarAlojamientos() {
+void SistemaUdeAStay::cargarAlojamientos(unsigned int& iteraciones, unsigned int& memoria) {
     ifstream archivo("alojamientos.txt");
 
     if (!archivo.is_open()) {
@@ -131,6 +140,7 @@ void SistemaUdeAStay::cargarAlojamientos() {
     int index = 0;
 
     while (getline(archivo, linea) && index < MAX_ALOJAMIENTOS) {
+        iteraciones++;
         if (linea.empty()) continue;
 
         size_t p1 = linea.find(';');
@@ -156,15 +166,18 @@ void SistemaUdeAStay::cargarAlojamientos() {
 
         bool amen[6];
         interpretarAmenidades(samen, amen);
+        iteraciones += 6;
 
         Alojamiento* nuevo = new Alojamiento(codigo, "Aloj" + to_string(codigo), tipo, dir, muni, depto, precio, amen);
         alojamientos[index] = nuevo;
+        memoria += sizeof(Alojamiento);
         index++;
 
         bool encontrado = false;
         for (int i = 0; i < MAX_ANFITRIONES && anfitriones[i] != nullptr; i++) {
+            iteraciones++;
             if (anfitriones[i]->getDocumento() == docAnfitrion) {
-                anfitriones[i]->agregarAlojamiento(nuevo);
+                anfitriones[i]->agregarAlojamiento(nuevo, iteraciones);
                 encontrado = true;
                 break;
             }
@@ -176,7 +189,6 @@ void SistemaUdeAStay::cargarAlojamientos() {
     }
 
     archivo.close();
-    cout << "Se cargaron " << index << " alojamientos correctamente." << endl;
 }
 
 void SistemaUdeAStay::interpretarAmenidades(const string& cadena, bool amenidades[6]) {
@@ -199,7 +211,7 @@ void SistemaUdeAStay::interpretarAmenidades(const string& cadena, bool amenidade
         amenidades[5] = true;}
 }
 
-void SistemaUdeAStay::cargarReservas() {
+void SistemaUdeAStay::cargarReservas(unsigned int& iteraciones, unsigned int& memoria) {
     ifstream archivo("reservas.txt");
 
     if (!archivo.is_open()) {
@@ -211,6 +223,7 @@ void SistemaUdeAStay::cargarReservas() {
     int index = 0;
 
     while (getline(archivo, linea) && index < MAX_RESERVAS) {
+        iteraciones++;
         if (linea.empty()) continue;
 
         size_t p1 = linea.find(';');
@@ -241,23 +254,25 @@ void SistemaUdeAStay::cargarReservas() {
                                          docHuesp, metodo, monto, nota);
 
         reservaciones[index] = r;
+        memoria += sizeof(Reservacion);
         index++;
 
         for (int i = 0; i < MAX_HUESPEDES && huespedes[i] != nullptr; i++) {
+            iteraciones++;
             if (huespedes[i]->getDocumento() == docHuesp) {
-                huespedes[i]->agregarReservacion(r);
+                huespedes[i]->agregarReservacion(r, iteraciones);
                 break;
             }
         }
 
         for (int i = 0; i < MAX_ALOJAMIENTOS && alojamientos[i] != nullptr; i++) {
+            iteraciones++;
             if (alojamientos[i]->getCodigo() == codigoAlojamiento) {
-                alojamientos[i]->agregarReservacion(r);
+                alojamientos[i]->agregarReservacion(r, iteraciones);
                 break;
             }
         }
     }
 
     archivo.close();
-    cout << "Se cargaron " << index << " reservas correctamente." << endl;
 }

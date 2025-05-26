@@ -23,11 +23,11 @@ public:
     ~SistemaUdeAStay();
     void mostrarMenu();
     void cargarDatos();
-    void cargarAnfitriones();
-    void cargarHuespedes();
-    void cargarAlojamientos();
+    void cargarAnfitriones(unsigned int& iteraciones, unsigned int& memoria);
+    void cargarHuespedes(unsigned int& iteraciones, unsigned int& memoria);
+    void cargarAlojamientos(unsigned int& iteraciones, unsigned int& memoria);
     void interpretarAmenidades(const string& cadena, bool amenidades[6]);
-    void cargarReservas();
+    void cargarReservas(unsigned int& iteraciones, unsigned int& memoria);
 
 };
 
