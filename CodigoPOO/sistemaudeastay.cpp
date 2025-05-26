@@ -28,23 +28,119 @@ void SistemaUdeAStay::mostrarMenu() {
     int opcion;
 
     do {
-        cout << "\n--- UdeAStay - Menu Principal ---\n";
-        cout << "1. Iniciar sesion\n";
-        cout << "2. Salir\n";
+        cout << endl << "--- UdeAStay - Menu Principal ---" << endl;
+        cout << "1. Iniciar sesion" << endl;
+        cout << "2. Salir" <<endl ;
         cout << "Seleccione una opcion: ";
         cin >> opcion;
 
         switch (opcion) {
         case 1:
-            cout << "Funcionalidad de login pendiente de implementar.\n";
+            iniciarSesion();
             break;
         case 2:
-            cout << "Saliendo del sistema...\n";
             break;
         default:
-            cout << "Opcion invalida.\n";
+            cout << "Opcion invalida." << endl;
         }
     } while (opcion != 2);
+}
+
+void SistemaUdeAStay::iniciarSesion() {
+    int opcion;
+    cout << endl << "== Iniciar sesion ==" << endl;
+    cout << "1. Ingresar como huesped" << endl;
+    cout << "2. Ingresar como anfitrion" << endl;
+    cout << "Ingrese una opcion: ";
+    cin >> opcion;
+
+    cin.ignore();
+    string doc;
+
+    cout << "Ingrese su numero de documento: ";
+    getline(cin, doc);
+
+    if (opcion == 1) {
+
+        for (int i = 0; i < MAX_HUESPEDES && huespedes[i] != nullptr; i++) {
+            if (huespedes[i]->getDocumento() == doc) {
+                cout << "Acceso concedido." << endl;
+                menuHuesped(huespedes[i]);
+                return;
+            }
+        }
+        cout << "Documento no registrado como huesped." << endl;
+
+    } else if (opcion == 2) {
+
+        for (int i = 0; i < MAX_ANFITRIONES && anfitriones[i] != nullptr; i++) {
+            if (anfitriones[i]->getDocumento() == doc) {
+                cout << "Acceso concedido." << endl;
+                menuAnfitrion(anfitriones[i]);
+                return;
+            }
+        }
+        cout << "Documento no registrado como anfitrion." << endl;
+
+    } else {
+        cout << "Opcion invalida." << endl;
+    }
+}
+
+void SistemaUdeAStay::menuHuesped(Huesped* h) {
+    int opcion;
+    do {
+        cout << endl << "=== Menu Huesped: " << h->getDocumento() << " ===" << endl;
+        cout << "1. Reservar alojamiento" << endl;
+        cout << "2. Anular una reservacion" << endl;
+        cout << "3. Cerrar sesion" << endl;
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        switch (opcion) {
+        case 1:
+            //reservarAlojamiento(h);
+            break;
+        case 2:
+            //anularReservacion(h);
+            break;
+        case 3:
+            cout << "Sesion cerrada." << endl;
+            break;
+        default:
+            cout << "Opcion invalida." << endl;
+        }
+    } while (opcion != 3);
+}
+
+void SistemaUdeAStay::menuAnfitrion(Anfitrion* a) {
+    int opcion;
+    do {
+        cout << endl << "=== Menu Anfitrion: " << a->getDocumento() << " ===" << endl;
+        cout << "1. Anular una reservacion" << endl;
+        cout << "2. Consultar reservaciones de mis alojamientos" << endl;
+        cout << "3. Actualizar historico de reservas" << endl;
+        cout << "4. Cerrar sesion" << endl;
+        cout << "Seleccione una opcion: ";
+        cin >> opcion;
+
+        switch (opcion) {
+        case 1:
+            //anularReservacion(a);
+            break;
+        case 2:
+            //consultarReservasAnfitrion(a);
+            break;
+        case 3:
+            //actualizarHistorico(a);
+            break;
+        case 4:
+            cout << "Sesion cerrada." << endl;
+            break;
+        default:
+            cout << "Opción inválida." << endl;
+        }
+    } while (opcion != 4);
 }
 
 void SistemaUdeAStay::cargarDatos() {

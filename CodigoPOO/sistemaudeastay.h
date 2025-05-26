@@ -19,9 +19,15 @@ private:
     Reservacion* reservaciones[MAX_RESERVAS];
 
 public:
+
     SistemaUdeAStay();
     ~SistemaUdeAStay();
+
     void mostrarMenu();
+    void iniciarSesion();
+    void menuHuesped(Huesped* h);
+    void menuAnfitrion(Anfitrion* a);
+
     void cargarDatos();
     void cargarAnfitriones(unsigned int& iteraciones, unsigned int& memoria);
     void cargarHuespedes(unsigned int& iteraciones, unsigned int& memoria);
