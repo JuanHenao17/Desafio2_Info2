@@ -1,20 +1,21 @@
 #ifndef HUESPED_H
 #define HUESPED_H
-
+#define MAX_RSVXHPD 50
+#include "reservacion.h"
 
 class Huesped {
 private:
-    unsigned int documento;
+    string documento;
     unsigned int antiguedad;       // en meses
     float puntuacion;     // de 0.0 a 5.0
-
+    Reservacion* reservaciones[MAX_RSVXHPD];
 
 public:
     Huesped();
-    Huesped(unsigned int doc, unsigned int ant, float punt);
+    Huesped(string doc, unsigned int ant, float punt);
 
     // Getters
-    unsigned int getDocumento() const;
+    string getDocumento() const;
     unsigned int getAntiguedad() const;
     float getPuntuacion() const;
 
