@@ -1,20 +1,21 @@
 #ifndef ANFITRION_H
 #define ANFITRION_H
-
+#define MAX_ALOJXANF 30
+#include "alojamiento.h"
 
 class Anfitrion {
 private:
-    unsigned int documento;
+    string documento;
     unsigned int antiguedad;      // en meses
     float puntuacion;    // de 0.0 a 5.0
-
+    Alojamiento* alojamientos[MAX_ALOJXANF];
 
 public:
     Anfitrion();
-    Anfitrion(unsigned int doc, unsigned int ant, float punt);
+    Anfitrion(string doc, unsigned int ant, float punt);
 
     // Getters
-    unsigned int getDocumento() const;
+    string getDocumento() const;
     unsigned int getAntiguedad() const;
     float getPuntuacion() const;
 
