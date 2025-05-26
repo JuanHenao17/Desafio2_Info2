@@ -27,6 +27,7 @@ public:
     void cargarHuespedes();
     void cargarAlojamientos();
     void interpretarAmenidades(const string& cadena, bool amenidades[6]);
+    void cargarReservas();
 
 };
 

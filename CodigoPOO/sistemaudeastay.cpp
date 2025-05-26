@@ -51,7 +51,7 @@ void SistemaUdeAStay::cargarDatos() {
     cargarAnfitriones();
     cargarHuespedes();
     cargarAlojamientos();
-    // Luego agregarás aquí: cargarHuespedes(), cargarAlojamientos(), etc.
+    cargarReservas();
 }
 
 void SistemaUdeAStay::cargarAnfitriones() {
@@ -197,4 +197,67 @@ void SistemaUdeAStay::interpretarAmenidades(const string& cadena, bool amenidade
         amenidades[4] = true;}
     if (cadena.find("patio") != string::npos){
         amenidades[5] = true;}
+}
+
+void SistemaUdeAStay::cargarReservas() {
+    ifstream archivo("reservas.txt");
+
+    if (!archivo.is_open()) {
+        cout << "Error al abrir el archivo reservas.txt" << endl;
+        return;
+    }
+
+    string linea;
+    int index = 0;
+
+    while (getline(archivo, linea) && index < MAX_RESERVAS) {
+        if (linea.empty()) continue;
+
+        size_t p1 = linea.find(';');
+        size_t p2 = linea.find(';', p1 + 1);
+        size_t p3 = linea.find(';', p2 + 1);
+        size_t p4 = linea.find(';', p3 + 1);
+        size_t p5 = linea.find(';', p4 + 1);
+        size_t p6 = linea.find(';', p5 + 1);
+        size_t p7 = linea.find(';', p6 + 1);
+        size_t p8 = linea.find(';', p7 + 1);
+
+        string codReserva = linea.substr(0, p1);
+        string scodAloj = linea.substr(p1 + 1, p2 - p1 - 1);
+        string docHuesp = linea.substr(p2 + 1, p3 - p2 - 1);
+        string fechaInicio = linea.substr(p3 + 1, p4 - p3 - 1);
+        string snoches = linea.substr(p4 + 1, p5 - p4 - 1);
+        string metodo = linea.substr(p5 + 1, p6 - p5 - 1);
+        string fechaPago = linea.substr(p6 + 1, p7 - p6 - 1);
+        string smonto = linea.substr(p7 + 1, p8 - p7 - 1);
+        string nota = linea.substr(p8 + 1);
+
+        unsigned int codigo = stoi(codReserva.substr(1));
+        unsigned int codigoAlojamiento = stoi(scodAloj);
+        unsigned int noches = stoi(snoches);
+        float monto = stof(smonto);
+
+        Reservacion* r = new Reservacion(codigo, fechaInicio, noches, codigoAlojamiento,
+                                         docHuesp, metodo, monto, nota);
+
+        reservaciones[index] = r;
+        index++;
+
+        for (int i = 0; i < MAX_HUESPEDES && huespedes[i] != nullptr; i++) {
+            if (huespedes[i]->getDocumento() == docHuesp) {
+                huespedes[i]->agregarReservacion(r);
+                break;
+            }
+        }
+
+        for (int i = 0; i < MAX_ALOJAMIENTOS && alojamientos[i] != nullptr; i++) {
+            if (alojamientos[i]->getCodigo() == codigoAlojamiento) {
+                alojamientos[i]->agregarReservacion(r);
+                break;
+            }
+        }
+    }
+
+    archivo.close();
+    cout << "Se cargaron " << index << " reservas correctamente." << endl;
 }
