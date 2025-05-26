@@ -1,8 +1,8 @@
 #ifndef ALOJAMIENTO_H
 #define ALOJAMIENTO_H
+#define MAX_RSVXALOJ 50
 #include <string>
 #include "reservacion.h"
-
 using namespace std;
 
 class Alojamiento {
@@ -16,7 +16,7 @@ private:
     double precioNoche;
     bool amenidades[6];    // ascensor, piscina, aire, caja, parqueadero, patio
 
-    Reservacion** reservaciones;
+    Reservacion* reservaciones[MAX_RSVXALOJ];
 
 public:
     Alojamiento();
@@ -38,4 +38,3 @@ public:
 };
 
 #endif
-

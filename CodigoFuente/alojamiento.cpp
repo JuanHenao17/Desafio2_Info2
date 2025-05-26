@@ -1,31 +1,29 @@
 #include "alojamiento.h"
 #include <string>
 
-Alojamiento::Alojamiento() {
-    codigo = 0;
-    nombre = "";
-    tipo = "";
-    direccion = "";
-    municipio = "";
-    departamento = "";
-    precioNoche = 0;
-    for (int i = 0; i < 6; i++) amenidades[i] = false;
-    reservaciones = nullptr;
+Alojamiento::Alojamiento() : codigo(0), nombre(""), tipo(""), direccion(""), municipio(""), departamento(""), precioNoche(0.0) {
 
+    for (int i = 0; i < 6; i++) {
+        amenidades[i] = false;
+    }
+
+    for (int i = 0; i < MAX_RSVXALOJ; ++i) {
+        reservaciones[i] = nullptr;
+    }
 }
 
-Alojamiento::Alojamiento(unsigned int cod, const string nom, const string tip, const string dir,
-                         const string muni, const string depto, double precio, const bool amen[]) {
-    codigo = cod;
-    nombre = nom;
-    tipo = tip;
-    direccion = dir;
-    municipio = muni;
-    departamento = depto;
-    precioNoche = precio;
-    for (int i = 0; i < 6; i++) amenidades[i] = amen[i];
-    reservaciones = nullptr;
 
+Alojamiento::Alojamiento(unsigned int cod, const string nom, const string tip, const string dir,
+                         const string muni, const string depto, double precio, const bool amen[]) : codigo(cod), nombre(nom), tipo(tip),
+    direccion(dir), municipio(muni), departamento(depto), precioNoche(precio) {
+
+    for (int i = 0; i < 6; i++) {
+        amenidades[i] = amen[i];
+    }
+
+    for (int i = 0; i < MAX_RSVXALOJ; ++i) {
+        reservaciones[i] = nullptr;
+    }
 }
 
 int Alojamiento::getCodigo() const { return codigo; }
@@ -36,4 +34,3 @@ const string Alojamiento::getMunicipio() const { return municipio; }
 const string Alojamiento::getDepartamento() const { return departamento; }
 double Alojamiento::getPrecioNoche() const { return precioNoche; }
 bool* Alojamiento::getAmenidades() { return amenidades; }
-
