@@ -1,4 +1,5 @@
 #include "huesped.h"
+#include <iostream>
 
 Huesped::Huesped() : documento(""), antiguedad(0), puntuacion(0.0) {
 
@@ -17,3 +18,14 @@ Huesped::Huesped(string doc, unsigned int ant, float punt) : documento(doc), ant
 string Huesped::getDocumento() const { return documento; }
 unsigned int Huesped::getAntiguedad() const { return antiguedad; }
 float Huesped::getPuntuacion() const { return puntuacion; }
+
+void Huesped::agregarReservacion(Reservacion* r, unsigned int& iteraciones) {
+    for (int i = 0; i < MAX_RSVXHPD; i++) {
+        iteraciones++;
+        if (reservaciones[i] == nullptr) {
+            reservaciones[i] = r;
+            return;
+        }
+    }
+    cout << "Huesped con documento " << documento << " ya tiene el maximo de reservas" << endl;
+}

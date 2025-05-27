@@ -24,7 +24,7 @@ public:
                 const string muni, const string depto, double precio, const bool amen[]);
 
     // Getters
-    int getCodigo() const;
+    unsigned int getCodigo() const;
     const string getNombre() const;
     const string getTipo() const;
     const string getDireccion() const;
@@ -34,6 +34,7 @@ public:
     bool* getAmenidades();
     Reservacion** getReservaciones() const;
 
+    void agregarReservacion(Reservacion* r, unsigned int& iteraciones);
 
 };
 

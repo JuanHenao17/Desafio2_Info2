@@ -18,7 +18,7 @@ public:
     string getDocumento() const;
     unsigned int getAntiguedad() const;
     float getPuntuacion() const;
-
+    void agregarAlojamiento(Alojamiento* nuevo, unsigned int& iteraciones);
 
 };
 

@@ -18,6 +18,7 @@ public:
     string getDocumento() const;
     unsigned int getAntiguedad() const;
     float getPuntuacion() const;
+    void agregarReservacion(Reservacion* r, unsigned int& iteraciones);
 
 
 };
