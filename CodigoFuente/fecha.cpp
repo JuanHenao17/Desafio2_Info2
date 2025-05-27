@@ -7,6 +7,8 @@ Fecha::Fecha() : dia(1), mes(1), anio(2000) {}
 
 Fecha::Fecha(int d, int m, int a) : dia(d), mes(m), anio(a) {}
 
+Fecha::Fecha(const Fecha& otra) : dia(otra.dia), mes(otra.mes), anio(otra.anio) {}
+
 int Fecha::getDia() const { return dia; }
 int Fecha::getMes() const { return mes; }
 int Fecha::getAnio() const { return anio; }
@@ -107,6 +109,10 @@ Fecha Fecha::sumarDias(int n) const {
 void Fecha::mostrarLarga() const {
     cout << nombreDiaSemana(dia, mes, anio) << ", " << dia
          << " de " << nombreMes(mes) << " del " << anio << endl;
+}
+
+void Fecha::mostrarCorta()const{
+    cout << dia << "/" << mes << "/" << anio << endl;
 }
 
 Fecha Fecha::desdeCadena(const string& s) {

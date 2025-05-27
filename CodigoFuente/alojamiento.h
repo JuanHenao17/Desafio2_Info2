@@ -32,7 +32,7 @@ public:
     const string getDepartamento() const;
     double getPrecioNoche() const;
     bool* getAmenidades();
-    Reservacion** getReservaciones() const;
+    Reservacion* getReservacion(int i) const;
 
     void agregarReservacion(Reservacion* r, unsigned int& iteraciones);
 

@@ -32,9 +32,9 @@ public:
     const string getMetodoPago() const;
     double getMonto() const;
     const string getNota() const;
-    Fecha getFechaInicio() const;
-    Fecha getFechaPago() const;
-    Fecha getFechaFin() const;
+    const Fecha& getFechaInicio() const;
+    const Fecha& getFechaPago() const;
+    const Fecha& getFechaFin() const;
 };
 
 #endif

@@ -1,9 +1,13 @@
-#include <iostream>
+#include "sistemaudeastay.h"
 
 using namespace std;
 
 int main()
 {
-    cout << "Hello World!" << endl;
+    SistemaUdeAStay sistema;
+
+    sistema.cargarDatos();
+    sistema.mostrarMenu();
+
     return 0;
 }

@@ -13,6 +13,7 @@ private:
 public:
     Fecha();
     Fecha(int d, int m, int a);
+    Fecha(const Fecha& otra);
 
     int getDia() const;
     int getMes() const;
@@ -33,6 +34,7 @@ public:
     static string nombreDiaSemana(int d, int m, int a);
     Fecha sumarDias(int n) const;
     void mostrarLarga() const;
+    void mostrarCorta() const;
     static Fecha desdeCadena(const string& s);
 };
 

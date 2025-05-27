@@ -36,6 +36,14 @@ const string Alojamiento::getDepartamento() const { return departamento; }
 double Alojamiento::getPrecioNoche() const { return precioNoche; }
 bool* Alojamiento::getAmenidades() { return amenidades; }
 
+Reservacion* Alojamiento::getReservacion(int i) const {
+    if (i >= 0 && i < MAX_RSVXALOJ && reservaciones[i] != nullptr){
+        return reservaciones[i];
+    }
+
+    return nullptr;
+}
+
 void Alojamiento::agregarReservacion(Reservacion* r, unsigned int& iteraciones) {
     for (int i = 0; i < MAX_RSVXALOJ; i++) {
         iteraciones++;

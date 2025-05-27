@@ -14,7 +14,7 @@ Reservacion::Reservacion(unsigned int cod, const Fecha& inicio, unsigned int n,
 
     fechaInicio = inicio;
     fechaPago = pago;
-    fechaFin = fechaInicio.sumarDias(noches - 1);
+    fechaFin = fechaInicio.sumarDias(noches);
 
 }
 
@@ -25,3 +25,6 @@ string Reservacion::getDocumentoHuesped() const { return documentoHuesped; }
 const string Reservacion::getMetodoPago() const { return metodoPago; }
 double Reservacion::getMonto() const { return monto; }
 const string Reservacion::getNota() const { return nota; }
+const Fecha& Reservacion::getFechaInicio() const { return fechaInicio; }
+const Fecha& Reservacion::getFechaPago() const { return fechaPago; }
+const Fecha& Reservacion::getFechaFin() const { return fechaFin; }

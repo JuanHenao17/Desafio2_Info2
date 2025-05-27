@@ -19,6 +19,15 @@ string Anfitrion::getDocumento() const { return documento; }
 unsigned int Anfitrion::getAntiguedad() const { return antiguedad; }
 float Anfitrion::getPuntuacion() const { return puntuacion; }
 
+Alojamiento* Anfitrion::getAlojamiento(int i) const {
+    if (i >= 0 && i < MAX_ALOJXANF && alojamientos[i] != nullptr){
+        return alojamientos[i];
+    }
+
+    return nullptr;
+}
+
+
 void Anfitrion::agregarAlojamiento(Alojamiento* nuevo, unsigned int& iteraciones) {
     for (int i = 0; i < MAX_ALOJXANF; i++) {
         iteraciones++;
