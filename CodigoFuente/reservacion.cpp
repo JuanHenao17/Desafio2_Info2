@@ -7,10 +7,14 @@ Reservacion::Reservacion() : codigo(0), noches(0), codigoAlojamiento(0), documen
 }
 
 
-Reservacion::Reservacion(unsigned int cod, unsigned int n,
-                         unsigned int codAloj, const string docHuesp,
-                         const string metodo, double m, const string notita) : codigo(cod), noches(n), codigoAlojamiento(codAloj),
-    documentoHuesped(docHuesp), metodoPago(metodo), monto(m), nota(notita) {
+Reservacion::Reservacion(unsigned int cod, const Fecha& inicio, unsigned int n,
+                         unsigned int codAloj, const string& docHuesp,
+                         const string& metodo, double m, const Fecha& pago, const string& notita) : codigo(cod), noches(n),
+    codigoAlojamiento(codAloj), documentoHuesped(docHuesp), metodoPago(metodo), monto(m), nota(notita) {
+
+    fechaInicio = inicio;
+    fechaPago = pago;
+    fechaFin = fechaInicio.sumarDias(noches - 1);
 
 }
 
