@@ -28,7 +28,7 @@ public:
     void iniciarSesion();
     void menuHuesped(Huesped* h);
     void reservarAlojamiento(Huesped* h);
-    void solicitarDatosReserva(Fecha& inicio, Fecha& fin,
+    int solicitarDatosReserva(Fecha& inicio, Fecha& fin,
                                string& municipio, unsigned int& noches,
                                double& precioMax, float& puntuacionMin);
     void menuAnfitrion(Anfitrion* a);
@@ -38,6 +38,7 @@ public:
     void cargarAlojamientos(unsigned int& iteraciones, unsigned int& memoria);
     void interpretarAmenidades(const string& cadena, bool amenidades[6]);
     void cargarReservas(unsigned int& iteraciones, unsigned int& memoria);
+    void contarReservasHistoricas(unsigned int& iteraciones);
 
 };
 

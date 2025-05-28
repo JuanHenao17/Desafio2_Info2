@@ -48,6 +48,7 @@ void SistemaUdeAStay::mostrarMenu() {
 }
 
 void SistemaUdeAStay::iniciarSesion() {
+    unsigned int iteraciones = 0;
     int opcion;
     cout << endl << "== Iniciar sesion ==" << endl;
     cout << "1. Ingresar como huesped" << endl;
@@ -64,25 +65,34 @@ void SistemaUdeAStay::iniciarSesion() {
     if (opcion == 1) {
 
         for (int i = 0; i < MAX_HUESPEDES && huespedes[i] != nullptr; i++) {
+            iteraciones++;
             if (huespedes[i]->getDocumento() == doc) {
+                cout << "Recursos utilizados en el inicio de sesion: " << endl;
+                cout << "Iteraciones realizadas: " << iteraciones << endl;
                 cout << "Acceso concedido." << endl;
                 menuHuesped(huespedes[i]);
                 return;
             }
         }
+        cout << "Recursos utilizados en el inicio de sesion: " << endl;
+        cout << "Iteraciones realizadas: " << iteraciones << endl;
         cout << "Documento no registrado como huesped." << endl;
 
     } else if (opcion == 2) {
 
         for (int i = 0; i < MAX_ANFITRIONES && anfitriones[i] != nullptr; i++) {
+            iteraciones++;
             if (anfitriones[i]->getDocumento() == doc) {
+                cout << "Recursos utilizados en el inicio de sesion: " << endl;
+                cout << "Iteraciones realizadas: " << iteraciones << endl;
                 cout << "Acceso concedido." << endl;
                 menuAnfitrion(anfitriones[i]);
                 return;
             }
         }
+        cout << "Recursos utilizados en el inicio de sesion: " << endl;
+        cout << "Iteraciones realizadas: " << iteraciones << endl;
         cout << "Documento no registrado como anfitrion." << endl;
-
     } else {
         cout << "Opcion invalida." << endl;
     }
@@ -124,7 +134,9 @@ void SistemaUdeAStay::reservarAlojamiento(Huesped* h) {
     float puntuacionMin;
     double precioMax;
 
-    solicitarDatosReserva(inicio, fin, municipio, noches, precioMax, puntuacionMin);
+    if(solicitarDatosReserva(inicio, fin, municipio, noches, precioMax, puntuacionMin) == -1){
+        return;
+    }
 
     int disponibles[MAX_ALOJAMIENTOS];
     int totalDisponibles = 0;
@@ -279,9 +291,9 @@ void SistemaUdeAStay::reservarAlojamiento(Huesped* h) {
     cout << "Memoria estimada: " << memoria << " bytes" << endl;
 }
 
-void SistemaUdeAStay::solicitarDatosReserva(Fecha& inicio, Fecha& fin,
+int SistemaUdeAStay::solicitarDatosReserva(Fecha& inicio, Fecha& fin,
                                             string& municipio, unsigned int& noches,
-                                            double& precioMax, float& puntuacionMin) {
+                                                                                      double& precioMax, float& puntuacionMin) {
     int d, m, a;
     char usarFiltros;
 
@@ -290,8 +302,8 @@ void SistemaUdeAStay::solicitarDatosReserva(Fecha& inicio, Fecha& fin,
     cin >> d >> m >> a;
 
     if (!Fecha::fechaValida(d, m, a)) {
-        cout << "Fecha invalida." << endl ;
-        return;
+        cout << "Fecha invalida. Reserva fallida" << endl ;
+        return -1;
     }
     inicio = Fecha(d, m, a);
 
@@ -316,6 +328,7 @@ void SistemaUdeAStay::solicitarDatosReserva(Fecha& inicio, Fecha& fin,
     }
 
     fin = inicio.sumarDias(noches - 1);
+    return 0;
 }
 
 void SistemaUdeAStay::menuAnfitrion(Anfitrion* a) {
@@ -356,6 +369,7 @@ void SistemaUdeAStay::cargarDatos() {
     cargarHuespedes(iteraciones, memoria);
     cargarAlojamientos(iteraciones, memoria);
     cargarReservas(iteraciones, memoria);
+    contarReservasHistoricas(iteraciones);
 
     cout << "Recursos utilizados en la carga de archivos: " << endl;
     cout << "Iteraciones realizadas: " << iteraciones << endl;
@@ -559,6 +573,7 @@ void SistemaUdeAStay::cargarReservas(unsigned int& iteraciones, unsigned int& me
 
         reservaciones[index] = r;
         memoria += sizeof(Reservacion);
+        totalReservas++;
         index++;
 
         for (int i = 0; i < MAX_HUESPEDES && huespedes[i] != nullptr; i++) {
@@ -575,6 +590,25 @@ void SistemaUdeAStay::cargarReservas(unsigned int& iteraciones, unsigned int& me
                 alojamientos[i]->agregarReservacion(r, iteraciones);
                 break;
             }
+        }
+    }
+
+    archivo.close();
+}
+
+void SistemaUdeAStay::contarReservasHistoricas(unsigned int& iteraciones) {
+    ifstream archivo("reservas_historicas.txt");
+    if (!archivo.is_open()) {
+        cout << "No se pudo abrir reservas_historicas.txt" << endl;
+        return;
+    }
+
+    string linea;
+
+    while (getline(archivo, linea)) {
+        iteraciones++;
+        if (!linea.empty()) {
+            totalReservas++;
         }
     }
 
