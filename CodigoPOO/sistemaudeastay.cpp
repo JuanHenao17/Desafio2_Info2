@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "sistemaudeastay.h"
+unsigned int SistemaUdeAStay::totalReservas = 0;
 
 SistemaUdeAStay::SistemaUdeAStay() {
     for (int i = 0; i < MAX_HUESPEDES; i++) {
@@ -99,7 +100,7 @@ void SistemaUdeAStay::menuHuesped(Huesped* h) {
 
         switch (opcion) {
         case 1:
-            //reservarAlojamiento(h);
+            reservarAlojamiento(h);
             break;
         case 2:
             //anularReservacion(h);
@@ -111,6 +112,210 @@ void SistemaUdeAStay::menuHuesped(Huesped* h) {
             cout << "Opcion invalida." << endl;
         }
     } while (opcion != 3);
+}
+
+void SistemaUdeAStay::reservarAlojamiento(Huesped* h) {
+
+    Fecha inicio, fin;
+    string municipio;
+    unsigned int noches;
+    unsigned int iteraciones = 0;
+    unsigned int memoria = 0;
+    float puntuacionMin;
+    double precioMax;
+
+    solicitarDatosReserva(inicio, fin, municipio, noches, precioMax, puntuacionMin);
+
+    int disponibles[MAX_ALOJAMIENTOS];
+    int totalDisponibles = 0;
+
+    for (int i = 0; i < MAX_ALOJAMIENTOS && alojamientos[i] != nullptr; i++) {
+
+        Alojamiento* a = alojamientos[i];
+
+        //Filtro por municipio
+        if (a->getMunicipio() != municipio){
+            continue;
+        }
+
+        //Filtro por precio
+        if (precioMax != -1 && a->getPrecioNoche() > precioMax){
+            continue;
+        }
+
+        //Filtro por puntuación del anfitrión
+        Anfitrion* duenio = nullptr;
+        for (int j = 0; j < MAX_ANFITRIONES && anfitriones[j] != nullptr; j++) {
+            for (int k = 0; k < MAX_ALOJXANF; k++) {
+                iteraciones++;
+                if (anfitriones[j]->getAlojamiento(k) == a) {
+                    duenio = anfitriones[j];
+                    break;
+                }
+            }
+            if (duenio != nullptr) {
+                break;}
+        }
+
+        if (puntuacionMin != -1 && (duenio == nullptr || duenio->getPuntuacion() < puntuacionMin)) {
+            continue;
+        }
+
+        // Verificar disponibilidad del alojamiento
+        bool ocupado = false;
+        for (int r = 0; r < MAX_RSVXALOJ; r++) {
+            iteraciones++;
+            Reservacion* resv = a->getReservacion(r);
+            if (resv != nullptr) {
+                if (!(fin < resv->getFechaInicio() || inicio > resv->getFechaFin())) {
+                    ocupado = true;
+                    break;
+                }
+            }
+        }
+
+        if (ocupado) {
+            continue; }
+
+        //Verificar que el huésped no tenga otra reserva en esas fechas
+        bool conflictoHuesped = false;
+        for (int r = 0; r < MAX_RSVXHPD; r++) {
+            iteraciones++;
+            Reservacion* resv = h->getReservacion(r);
+            if (resv != nullptr) {
+                if (!(fin < resv->getFechaInicio() || inicio > resv->getFechaFin())) {
+                    conflictoHuesped = true;
+                    break;
+                }
+            }
+        }
+
+        if (conflictoHuesped) {
+            continue; }
+
+        //Agregar indice de candidato e imprimirlo
+        disponibles[totalDisponibles] = i;
+        totalDisponibles++;
+
+        cout << totalDisponibles << ". Codigo: " << a->getCodigo()
+             << " | Nombre: " << a->getNombre()
+             << " | Tipo: " << a->getTipo()
+             << " | Precio/noche: $" << a->getPrecioNoche();
+
+        if (duenio != nullptr)
+            cout << " | Puntuacion del anfitrion: " << duenio->getPuntuacion();
+
+        cout << endl;
+
+    }
+
+    int seleccion;
+    cout << endl << "Ingrese el numero del alojamiento que desea reservar (1 a " << totalDisponibles << "): ";
+    cin >> seleccion;
+
+    if (seleccion < 1 || seleccion > totalDisponibles) {
+        cout << "Seleccion invalida." << endl;
+        return;
+    }
+
+    int idx = disponibles[seleccion - 1];
+    Alojamiento* alojamientoSeleccionado = alojamientos[idx];
+    Fecha fechaPago = inicio;
+
+    totalReservas++;
+    unsigned int nuevoCodigo = totalReservas;
+    double montoTotal = alojamientoSeleccionado->getPrecioNoche() * noches;
+    string metodoP;
+
+    if(nuevoCodigo % 2 == 0){
+        metodoP = "PSE";
+    }
+    else{
+        metodoP = "Tcredito";
+    }
+
+    cin.ignore();
+    string anotacion;
+    cout << "Ingrese una anotacion para la reserva (max. 1000 caracteres): ";
+    getline(cin, anotacion);
+
+    if (anotacion.length() > 1000) {
+        anotacion = anotacion.substr(0, 1000);
+    }
+
+    Reservacion* nuevaReserva = new Reservacion(nuevoCodigo, inicio, noches,
+                                                alojamientoSeleccionado->getCodigo(),
+                                                h->getDocumento(), metodoP,
+                                                montoTotal, fechaPago, anotacion);
+
+    memoria += sizeof(Reservacion);
+
+    for (int i = 0; i < MAX_RESERVAS; i++) {
+        iteraciones++;
+        if(reservaciones[i] == nullptr){
+            reservaciones[i] = nuevaReserva;
+        }
+    }
+
+    h->agregarReservacion(nuevaReserva, iteraciones);
+    alojamientoSeleccionado->agregarReservacion(nuevaReserva, iteraciones);
+
+
+    cout << endl << "Reserva confirmada" << endl;
+    cout << "Codigo: N" << nuevoCodigo << endl;
+    cout << "Huesped: " << h->getDocumento() << endl;
+    cout << "Alojamiento: " << alojamientoSeleccionado->getCodigo() << " - " << alojamientoSeleccionado->getNombre() << endl;
+
+    cout << "Fecha de inicio: ";
+    inicio.mostrarLarga();
+
+    cout << "Fecha de finalizacion: ";
+    nuevaReserva->getFechaFin().mostrarLarga();
+
+    cout << "Total: $" << montoTotal << endl;
+
+    cout << "Recursos utilizados en la reservacion: " << endl;
+    cout << "Iteraciones realizadas: " << iteraciones << endl;
+    cout << "Memoria estimada: " << memoria << " bytes" << endl;
+}
+
+void SistemaUdeAStay::solicitarDatosReserva(Fecha& inicio, Fecha& fin,
+                                            string& municipio, unsigned int& noches,
+                                            double& precioMax, float& puntuacionMin) {
+    int d, m, a;
+    char usarFiltros;
+
+    cout << endl << "== Reservar alojamiento ==" << endl;
+    cout << "Ingrese la fecha de inicio (dia mes anio): ";
+    cin >> d >> m >> a;
+
+    if (!Fecha::fechaValida(d, m, a)) {
+        cout << "Fecha invalida." << endl ;
+        return;
+    }
+    inicio = Fecha(d, m, a);
+
+    cin.ignore();
+    cout << "Ingrese el municipio: ";
+    getline(cin, municipio);
+
+    cout << "Ingrese la cantidad de noches: ";
+    cin >> noches;
+
+    cout << "Desea aplicar filtros? (s/n): ";
+    cin >> usarFiltros;
+
+    if (usarFiltros == 's' || usarFiltros == 'S') {
+        cout << "Ingrese precio maximo por noche (-1 para ignorar): ";
+        cin >> precioMax;
+        cout << "Ingrese puntuacion minima del anfitrion (-1 para ignorar): ";
+        cin >> puntuacionMin;
+    } else {
+        precioMax = -1;
+        puntuacionMin = -1;
+    }
+
+    fin = inicio.sumarDias(noches - 1);
 }
 
 void SistemaUdeAStay::menuAnfitrion(Anfitrion* a) {
@@ -175,9 +380,9 @@ void SistemaUdeAStay::cargarAnfitriones(unsigned int& iteraciones, unsigned int&
         size_t pos1 = linea.find(';');
         size_t pos2 = linea.find(';', pos1 + 1);
 
-        string doc = linea.substr(0, pos1);                          // documento
-        string campo2 = linea.substr(pos1 + 1, pos2 - pos1 - 1);        // antigüedad
-        string campo3 = linea.substr(pos2 + 1);                         // puntuación
+        string doc = linea.substr(0, pos1);
+        string campo2 = linea.substr(pos1 + 1, pos2 - pos1 - 1);
+        string campo3 = linea.substr(pos2 + 1);
 
         unsigned int antiguedad = stoi(campo2);
         float puntuacion = stof(campo3);
@@ -341,13 +546,16 @@ void SistemaUdeAStay::cargarReservas(unsigned int& iteraciones, unsigned int& me
         string smonto = linea.substr(p7 + 1, p8 - p7 - 1);
         string nota = linea.substr(p8 + 1);
 
+        Fecha ini = Fecha::desdeCadena(fechaInicio);
+        Fecha fin = Fecha::desdeCadena(fechaPago);
+
         unsigned int codigo = stoi(codReserva.substr(1));
         unsigned int codigoAlojamiento = stoi(scodAloj);
         unsigned int noches = stoi(snoches);
         float monto = stof(smonto);
 
-        Reservacion* r = new Reservacion(codigo, fechaInicio, noches, codigoAlojamiento,
-                                         docHuesp, metodo, monto, nota);
+        Reservacion* r = new Reservacion(codigo, ini, noches, codigoAlojamiento,
+                                         docHuesp, metodo, monto, fin, nota);
 
         reservaciones[index] = r;
         memoria += sizeof(Reservacion);

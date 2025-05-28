@@ -17,6 +17,7 @@ private:
     Anfitrion* anfitriones[MAX_ANFITRIONES];
     Alojamiento* alojamientos[MAX_ALOJAMIENTOS];
     Reservacion* reservaciones[MAX_RESERVAS];
+    static unsigned int totalReservas;
 
 public:
 
@@ -26,8 +27,11 @@ public:
     void mostrarMenu();
     void iniciarSesion();
     void menuHuesped(Huesped* h);
+    void reservarAlojamiento(Huesped* h);
+    void solicitarDatosReserva(Fecha& inicio, Fecha& fin,
+                               string& municipio, unsigned int& noches,
+                               double& precioMax, float& puntuacionMin);
     void menuAnfitrion(Anfitrion* a);
-
     void cargarDatos();
     void cargarAnfitriones(unsigned int& iteraciones, unsigned int& memoria);
     void cargarHuespedes(unsigned int& iteraciones, unsigned int& memoria);
