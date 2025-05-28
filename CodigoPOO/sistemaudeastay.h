@@ -26,12 +26,17 @@ public:
 
     void mostrarMenu();
     void iniciarSesion();
+
     void menuHuesped(Huesped* h);
     void reservarAlojamiento(Huesped* h);
     int solicitarDatosReserva(Fecha& inicio, Fecha& fin,
                                string& municipio, unsigned int& noches,
                                double& precioMax, float& puntuacionMin);
+
     void menuAnfitrion(Anfitrion* a);
+    void consultarReservasAnfitrion(Anfitrion* a);
+    void actualizarHistorico();
+
     void cargarDatos();
     void cargarAnfitriones(unsigned int& iteraciones, unsigned int& memoria);
     void cargarHuespedes(unsigned int& iteraciones, unsigned int& memoria);

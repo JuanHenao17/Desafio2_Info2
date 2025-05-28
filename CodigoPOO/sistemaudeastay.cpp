@@ -76,7 +76,7 @@ void SistemaUdeAStay::iniciarSesion() {
         }
         cout << "Recursos utilizados en el inicio de sesion: " << endl;
         cout << "Iteraciones realizadas: " << iteraciones << endl;
-        cout << "Documento no registrado como huesped." << endl;
+        cout << endl << "Documento no registrado como huesped." << endl;
 
     } else if (opcion == 2) {
 
@@ -85,14 +85,14 @@ void SistemaUdeAStay::iniciarSesion() {
             if (anfitriones[i]->getDocumento() == doc) {
                 cout << "Recursos utilizados en el inicio de sesion: " << endl;
                 cout << "Iteraciones realizadas: " << iteraciones << endl;
-                cout << "Acceso concedido." << endl;
+                cout << endl << "Acceso concedido." << endl;
                 menuAnfitrion(anfitriones[i]);
                 return;
             }
         }
         cout << "Recursos utilizados en el inicio de sesion: " << endl;
         cout << "Iteraciones realizadas: " << iteraciones << endl;
-        cout << "Documento no registrado como anfitrion." << endl;
+        cout << endl << "Documento no registrado como anfitrion." << endl;
     } else {
         cout << "Opcion invalida." << endl;
     }
@@ -274,7 +274,7 @@ void SistemaUdeAStay::reservarAlojamiento(Huesped* h) {
 
 
     cout << endl << "Reserva confirmada" << endl;
-    cout << "Codigo: N" << nuevoCodigo << endl;
+    cout << "Codigo: R" << nuevoCodigo << endl;
     cout << "Huesped: " << h->getDocumento() << endl;
     cout << "Alojamiento: " << alojamientoSeleccionado->getCodigo() << " - " << alojamientoSeleccionado->getNombre() << endl;
 
@@ -347,10 +347,10 @@ void SistemaUdeAStay::menuAnfitrion(Anfitrion* a) {
             //anularReservacion(a);
             break;
         case 2:
-            //consultarReservasAnfitrion(a);
+            consultarReservasAnfitrion(a);
             break;
         case 3:
-            //actualizarHistorico(a);
+            actualizarHistorico();
             break;
         case 4:
             cout << "Sesion cerrada." << endl;
@@ -359,6 +359,172 @@ void SistemaUdeAStay::menuAnfitrion(Anfitrion* a) {
             cout << "Opción inválida." << endl;
         }
     } while (opcion != 4);
+}
+
+void SistemaUdeAStay::consultarReservasAnfitrion(Anfitrion* a) {
+
+    unsigned int iteraciones = 0;
+
+    cout << "\n--- Reservas de los alojamientos del anfitrion: " << a->getDocumento() << " ---\n";
+
+    cout << endl << "Ingrese fecha de inicio del rango (formato DD-MM-AAAA): ";
+    string inicioStr;
+    getline(cin >> ws, inicioStr);
+    Fecha fechaInicioFiltro = Fecha::desdeCadena(inicioStr);
+
+    if (!Fecha::fechaValida(fechaInicioFiltro.getDia(), fechaInicioFiltro.getMes(), fechaInicioFiltro.getAnio())) {
+        cout << "Fecha invalida. Consulta fallida" << endl ;
+        return;
+    }
+
+    cout << endl << "Ingrese fecha de fin del rango (formato DD-MM-AAAA): ";
+    string finStr;
+    getline(cin, finStr);
+    Fecha fechaFinFiltro = Fecha::desdeCadena(finStr);
+
+    if (!Fecha::fechaValida(fechaFinFiltro.getDia(), fechaFinFiltro.getMes(), fechaFinFiltro.getAnio())) {
+        cout << "Fecha invalida. Consulta fallida" << endl ;
+        return;
+    }
+
+    for (int i = 0; i < MAX_ALOJXANF; i++) {
+        Alojamiento* aloja = a->getAlojamiento(i);
+
+        if(aloja == nullptr){
+            return;
+        }
+
+        cout << endl << "Alojamiento #" << aloja->getCodigo() << " - " << aloja->getDireccion() << endl;
+
+        for (int j = 0; j < MAX_RSVXALOJ; j++) {
+            iteraciones++;
+            Reservacion* r = aloja->getReservacion(j);
+
+            if(r==nullptr){
+                break;
+            }
+
+            Fecha fi = r->getFechaInicio();
+            Fecha ff = r->getFechaFin();
+
+            if (ff < fechaInicioFiltro || fi > fechaFinFiltro) {
+                continue;
+            }
+
+            cout << " Reserva #" << r->getCodigo() << " - Huesped: " << r->getDocumentoHuesped() << endl;
+            cout << " Fecha Inicio: ";
+            fi.mostrarCorta();
+            cout << " Fecha fin: ";
+            ff.mostrarCorta();
+        }
+    }
+    cout << "Recursos utilizados en la consulta: " << endl;
+    cout << "Iteraciones realizadas: " << iteraciones << endl;
+}
+
+
+void SistemaUdeAStay::actualizarHistorico(){
+
+    unsigned int iteraciones = 0;
+    unsigned int memoria = 0;
+    int d, m, a;
+    cout << "Ingrese la fecha de corte (dia mes anio): ";
+    cin >> d >> m >> a;
+
+    if (!Fecha::fechaValida(d, m, a)) {
+        cout << "Fecha invalida." << endl;
+        return;
+    }
+
+    Fecha fechaCorte(d, m, a);
+
+    ofstream historico("reservas_historicas.txt", ios::app);
+    if (!historico.is_open()) {
+        cout << "No se pudo abrir reservas_historicas.txt para escritura." << endl;
+        return;
+    }
+
+    ifstream verificador("reservas_historicas.txt");
+    if (verificador.is_open()) {
+        verificador.seekg(-1, ios::end);
+        char ultimo;
+        verificador.get(ultimo);
+        if (ultimo != '\n') historico << endl;
+        verificador.close();
+    }
+
+    for (int i = 0; i < MAX_RESERVAS; i++) {
+        iteraciones++;
+        Reservacion* r = reservaciones[i];
+        if (r != nullptr && r->getFechaFin() < fechaCorte) {
+            memoria+= sizeof(Reservacion);
+            // Escribir en archivo historico
+            historico << "R" << r->getCodigo() << ";"
+                      << r->getCodigoAlojamiento() << ";"
+                      << r->getDocumentoHuesped() << ";"
+                      << r->getFechaInicio().FechaAstr() << ";"
+                      << r->getNoches() << ";"
+                      << r->getMetodoPago() << ";"
+                      << r->getFechaPago().FechaAstr() << ";"
+                      << r->getMonto() << ";"
+                      << r->getNota() << endl;
+
+            // Quitar de huesped
+            for (int h = 0; h < MAX_HUESPEDES && huespedes[h] != nullptr; h++) {
+                iteraciones++;
+                if (huespedes[h]->getDocumento() == r->getDocumentoHuesped()) {
+                    huespedes[h]->eliminarReservacion(r, iteraciones);
+                    break;
+                }
+            }
+
+            // Quitar de alojamiento
+            for (int a = 0; a < MAX_ALOJAMIENTOS && alojamientos[a] != nullptr; a++) {
+                iteraciones++;
+                if (alojamientos[a]->getCodigo() == r->getCodigoAlojamiento()) {
+                    alojamientos[a]->eliminarReservacion(r, iteraciones);
+                    break;
+                }
+            }
+
+            // Eliminar del arreglo global
+            delete r;
+            reservaciones[i] = nullptr;
+
+        }
+    }
+
+    ofstream reservasOut("reservas.txt");
+    if (!reservasOut.is_open()) {
+        cout << "No se pudo abrir reservas.txt para actualizaciOn" << endl;
+        return;
+    }
+
+    for (int i = 0; i < MAX_RESERVAS; i++) {
+        iteraciones++;
+        if(reservaciones[i] != nullptr){
+
+            Reservacion* r = reservaciones[i];
+            reservasOut << "R" << r->getCodigo() << ";"
+                        << r->getCodigoAlojamiento() << ";"
+                        << r->getDocumentoHuesped() << ";"
+                        << r->getFechaInicio().FechaAstr() << ";"
+                        << r->getNoches() << ";"
+                        << r->getMetodoPago() << ";"
+                        << r->getFechaPago().FechaAstr() << ";"
+                        << r->getMonto() << ";"
+                        << r->getNota() << endl;
+
+        }
+    }
+
+    reservasOut.close();
+
+    cout << "Recursos utilizados en la actualizacion: " << endl;
+    cout << "Iteraciones realizadas: " << iteraciones << endl;
+    cout << "Memoria liberada estimada: " << memoria << " bytes" << endl;
+    cout << endl << "Archivos actualizados correctamente" << endl;
+
 }
 
 void SistemaUdeAStay::cargarDatos() {
