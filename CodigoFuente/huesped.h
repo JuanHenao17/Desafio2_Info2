@@ -19,6 +19,8 @@ public:
     unsigned int getAntiguedad() const;
     float getPuntuacion() const;
     void agregarReservacion(Reservacion* r, unsigned int& iteraciones);
+    bool eliminarReservacionPorCodigo(unsigned int cod);
+    Reservacion* getReservacion(int i) const;
 
 
 };

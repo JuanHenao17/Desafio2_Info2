@@ -54,3 +54,15 @@ void Alojamiento::agregarReservacion(Reservacion* r, unsigned int& iteraciones) 
     }
     cout << "Alojamiento con codigo " << codigo << " ya tiene el maximo de reservas." << endl;
 }
+bool Alojamiento::eliminarReservacionPorCodigo(unsigned int cod) {
+    for (int i = 0; i < MAX_RSVXALOJ; i++) {
+        if (reservaciones[i] != nullptr && reservaciones[i]->getCodigo() == cod) {
+            delete reservaciones[i];            // liberar memoria
+            reservaciones[i] = nullptr;         // marcar espacio como libre
+            return true;
+        }
+    }
+    return false; // No se encontró la reserva
+}
+
+

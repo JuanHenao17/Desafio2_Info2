@@ -33,7 +33,7 @@ public:
     double getPrecioNoche() const;
     bool* getAmenidades();
     Reservacion* getReservacion(int i) const;
-
+    bool eliminarReservacionPorCodigo(unsigned int cod);
     void agregarReservacion(Reservacion* r, unsigned int& iteraciones);
 
 };

@@ -29,3 +29,22 @@ void Huesped::agregarReservacion(Reservacion* r, unsigned int& iteraciones) {
     }
     cout << "Huesped con documento " << documento << " ya tiene el maximo de reservas" << endl;
 }
+bool Huesped::eliminarReservacionPorCodigo(unsigned int cod) {
+    for (int i = 0; i < MAX_RSVXHPD; i++) {
+        if (reservaciones[i] != nullptr && reservaciones[i]->getCodigo() == cod) {
+            reservaciones[i] = nullptr;
+                return true;
+        }
+    }
+        return false;
+}
+
+Reservacion* Huesped::getReservacion(int i) const {
+    if (i >= 0 && i < MAX_RSVXHPD && reservaciones[i] != nullptr){
+        return reservaciones[i];
+    }
+
+    return nullptr;
+}
+
+

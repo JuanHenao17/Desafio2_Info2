@@ -35,6 +35,8 @@ public:
     void interpretarAmenidades(const string& cadena, bool amenidades[6]);
     void cargarReservas(unsigned int& iteraciones, unsigned int& memoria);
     void consultarReservasAnfitrion(Anfitrion* a);
+    void anularReservacion(Anfitrion* a);
+    void anularReservacion(Huesped* h);
 
 
 };
