@@ -1,0 +1,3 @@
+1001;5050505050;Antioquia;Medellin;apartamento;Calle 50 #10-25;180000;ascensor,piscina,aire
+1002;5050505050;Antioquia;Medellin;casa;Carrera 30 #12-60;150000;patio,parqueadero
+1003;6060606060;Antioquia;Rionegro;casa;Calle 20 #5-19;120000;caja,patio

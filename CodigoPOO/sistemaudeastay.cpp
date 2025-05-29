@@ -113,7 +113,7 @@ void SistemaUdeAStay::menuHuesped(Huesped* h) {
             reservarAlojamiento(h);
             break;
         case 2:
-            //anularReservacion(h);
+            anularReservacion(h);
             break;
         case 3:
             cout << "Sesion cerrada." << endl;
@@ -331,6 +331,69 @@ int SistemaUdeAStay::solicitarDatosReserva(Fecha& inicio, Fecha& fin,
     return 0;
 }
 
+void SistemaUdeAStay::anularReservacion(Huesped* h) {
+    unsigned int iteraciones = 0;
+    unsigned int memoria = 0;
+    cout << "\n--- Anular Reservacion ---\n";
+
+    int count = 0;
+
+    for (int i = 0; i < MAX_RSVXHPD; ++i) {
+        iteraciones++;
+        Reservacion* r = h->getReservacion(i);
+        if (r == nullptr) continue;
+
+        cout << "Código: R" << r->getCodigo()
+             << " - Alojamiento: " << r->getCodigoAlojamiento()
+             << " - Fecha inicio: ";
+        r->getFechaInicio().mostrarCorta();
+        cout << endl;
+
+        count++;
+    }
+
+    if (count == 0) {
+        cout << "No tienes reservaciones activas.\n";
+        return;
+    }
+
+    cout << "Ingrese el codigo de la reserva a anular (solo numero, sin 'R'): ";
+    unsigned int codigo;
+    cin >> codigo;
+
+    // Eliminar del huesped
+    bool eliminada = h->eliminarReservacionPorCodigo(codigo, iteraciones);
+
+    // Eliminar del alojamiento
+    for (int i = 0; i < MAX_ALOJAMIENTOS && alojamientos[i] != nullptr; i++) {
+        alojamientos[i]->eliminarReservacionPorCodigo(codigo, iteraciones);
+    }
+
+    // Eliminar del arreglo global
+    for (int i = 0; i < MAX_RESERVAS; ++i) {
+        iteraciones++;
+        if (reservaciones[i] != nullptr && reservaciones[i]->getCodigo() == codigo) {
+            memoria += sizeof(Reservacion);
+            delete reservaciones[i];
+            reservaciones[i] = nullptr;
+            break;
+        }
+    }
+
+    if (eliminada) {
+        cout << "Recursos utilizados en la anulacion: " << endl;
+        cout << "Iteraciones realizadas: " << iteraciones << endl;
+        cout << "Memoria liberada estimada: " << memoria << " bytes" << endl;
+        cout << endl << "Reservacion anulada exitosamente.\n";
+
+    } else {
+        cout << "Recursos utilizados en la anulacion: " << endl;
+        cout << "Iteraciones realizadas: " << iteraciones << endl;
+        cout << "Memoria liberada estimada: " << memoria << " bytes" << endl;
+        cout << endl << "No se encontro una reservacion con ese codigo.\n";
+    }
+}
+
 void SistemaUdeAStay::menuAnfitrion(Anfitrion* a) {
     int opcion;
     do {
@@ -344,7 +407,7 @@ void SistemaUdeAStay::menuAnfitrion(Anfitrion* a) {
 
         switch (opcion) {
         case 1:
-            //anularReservacion(a);
+            anularReservacion(a);
             break;
         case 2:
             consultarReservasAnfitrion(a);
@@ -359,6 +422,99 @@ void SistemaUdeAStay::menuAnfitrion(Anfitrion* a) {
             cout << "Opción inválida." << endl;
         }
     } while (opcion != 4);
+}
+
+void SistemaUdeAStay::anularReservacion(Anfitrion* a) {
+    unsigned int memoria = 0;
+    unsigned int iteraciones = 0;
+    cout << "\n--- Anular Reservacion ---\n";
+
+    // Mostrar alojamientos disponibles
+    int indicesValidos[MAX_ALOJXANF];
+    int countAlojamientos = 0;
+
+    for (int i = 0; i < MAX_ALOJXANF; ++i) {
+        iteraciones++;
+        Alojamiento* alo = a->getAlojamiento(i);
+        if (alo == nullptr) break;
+
+        cout << countAlojamientos + 1 << ". " << alo->getCodigo()
+             << " - " << alo->getDireccion() << endl;
+        indicesValidos[countAlojamientos] = i;
+        countAlojamientos++;
+    }
+
+    if (countAlojamientos == 0) {
+        cout << "El anfitrion no tiene alojamientos registrados.\n";
+        return;
+    }
+
+    cout << "Seleccione el alojamiento (numero): ";
+    int opcion;
+    cin >> opcion;
+
+    if (opcion < 1 || opcion > countAlojamientos) {
+        cout << "Opcion invalida.\n";
+        return;
+    }
+
+    Alojamiento* seleccionado = a->getAlojamiento(indicesValidos[opcion - 1]);
+
+    // Mostrar reservaciones de ese alojamiento
+    int countReservas = 0;
+
+    for (int i = 0; i < MAX_RSVXALOJ; ++i) {
+        iteraciones++;
+        Reservacion* r = seleccionado->getReservacion(i);
+        if (r == nullptr) continue;
+
+        cout << "Codigo: " << r->getCodigo()
+             << " - Huesped: " << r->getDocumentoHuesped() << endl;
+
+        countReservas++;
+    }
+
+    if (countReservas == 0) {
+        cout << "Este alojamiento no tiene reservas.\n";
+        return;
+    }
+
+    cout << "Ingrese el codigo de la reserva a anular: ";
+    unsigned int codigo;
+    cin >> codigo;
+
+    // Eliminar de alojamiento
+    bool eliminada = seleccionado->eliminarReservacionPorCodigo(codigo, iteraciones);
+
+    // Eliminar de huésped
+    for (int i = 0; i < MAX_HUESPEDES && huespedes[i] != nullptr; i++) {
+        huespedes[i]->eliminarReservacionPorCodigo(codigo, iteraciones);
+    }
+
+    // Eliminar de arreglo general
+    for (int i = 0; i < MAX_RESERVAS; ++i) {
+        iteraciones++;
+        if (reservaciones[i] != nullptr && reservaciones[i]->getCodigo() == codigo) {
+            memoria += sizeof(Reservacion);
+            delete reservaciones[i];
+            reservaciones[i] = nullptr;
+            break;
+        }
+    }
+
+    if (eliminada) {
+
+        cout << "Recursos utilizados en la anulacion: " << endl;
+        cout << "Iteraciones realizadas: " << iteraciones << endl;
+        cout << "Memoria liberada estimada: " << memoria << " bytes" << endl;
+        cout << endl << "Reservacion anulada exitosamente.\n";
+
+    } else {
+        cout << "Recursos utilizados en la anulacion: " << endl;
+        cout << "Iteraciones realizadas: " << iteraciones << endl;
+        cout << "Memoria liberada estimada: " << memoria << " bytes" << endl;
+        cout << endl << "No se encontro una reservacion con ese codigo en el alojamiento seleccionado.\n";
+    }
 }
 
 void SistemaUdeAStay::consultarReservasAnfitrion(Anfitrion* a) {

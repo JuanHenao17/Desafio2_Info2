@@ -32,6 +32,8 @@ public:
     int solicitarDatosReserva(Fecha& inicio, Fecha& fin,
                                string& municipio, unsigned int& noches,
                                double& precioMax, float& puntuacionMin);
+    void anularReservacion(Anfitrion* a);
+    void anularReservacion(Huesped* h);
 
     void menuAnfitrion(Anfitrion* a);
     void consultarReservasAnfitrion(Anfitrion* a);
